@@ -1,0 +1,378 @@
+/* Advanced Visual Effects */
+
+/* Ripple effect for buttons */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Listening animation for voice input */
+.message-input.listening {
+    border-color: var(--accent-success);
+    animation: listening-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes listening-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(6, 255, 165, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(6, 255, 165, 0);
+    }
+}
+
+/* Particle effects */
+.particle {
+    position: fixed;
+    pointer-events: none;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+    border-radius: 50%;
+    animation: particle-float 1s ease-out forwards;
+}
+
+@keyframes particle-float {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(var(--x) * 50px), calc(var(--y) * -100px)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Holographic effect */
+.holographic {
+    background: linear-gradient(
+        45deg,
+        #ff006e,
+        #8338ec,
+        #3a86ff,
+        #06ffa5,
+        #ffbe0b,
+        #fb5607,
+        #ff006e
+    );
+    background-size: 300% 300%;
+    animation: holographic-shift 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+@keyframes holographic-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Neon glow effect */
+.neon-glow {
+    text-shadow: 
+        0 0 10px var(--gradient-1),
+        0 0 20px var(--gradient-1),
+        0 0 30px var(--gradient-1),
+        0 0 40px var(--gradient-2),
+        0 0 70px var(--gradient-2),
+        0 0 80px var(--gradient-2),
+        0 0 100px var(--gradient-2),
+        0 0 150px var(--gradient-2);
+}
+
+/* Matrix rain effect (optional background) */
+.matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.05;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: monospace;
+    font-size: 16px;
+    color: var(--gradient-4);
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    to {
+        transform: translateY(calc(100vh + 100%));
+    }
+}
+
+/* Glitch effect */
+.glitch {
+    position: relative;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    animation: glitch-1 0.5s infinite;
+    color: var(--gradient-1);
+    z-index: -1;
+}
+
+.glitch::after {
+    animation: glitch-2 0.5s infinite;
+    color: var(--gradient-3);
+    z-index: -2;
+}
+
+@keyframes glitch-skew {
+    0% {
+        transform: skew(0deg);
+    }
+    20% {
+        transform: skew(2deg);
+    }
+    40% {
+        transform: skew(-2deg);
+    }
+    60% {
+        transform: skew(1deg);
+    }
+    80% {
+        transform: skew(-1deg);
+    }
+    100% {
+        transform: skew(0deg);
+    }
+}
+
+@keyframes glitch-1 {
+    0% {
+        clip-path: inset(40% 0 61% 0);
+        transform: translate(-2px, -2px);
+    }
+    20% {
+        clip-path: inset(92% 0 1% 0);
+        transform: translate(2px, 2px);
+    }
+    40% {
+        clip-path: inset(43% 0 1% 0);
+        transform: translate(-2px, 2px);
+    }
+    60% {
+        clip-path: inset(25% 0 58% 0);
+        transform: translate(2px, -2px);
+    }
+    80% {
+        clip-path: inset(54% 0 7% 0);
+        transform: translate(-2px, -2px);
+    }
+    100% {
+        clip-path: inset(58% 0 43% 0);
+        transform: translate(2px, 2px);
+    }
+}
+
+@keyframes glitch-2 {
+    0% {
+        clip-path: inset(50% 0 30% 0);
+        transform: translate(2px, -2px);
+    }
+    20% {
+        clip-path: inset(30% 0 50% 0);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        clip-path: inset(60% 0 20% 0);
+        transform: translate(2px, 2px);
+    }
+    60% {
+        clip-path: inset(20% 0 60% 0);
+        transform: translate(-2px, -2px);
+    }
+    80% {
+        clip-path: inset(40% 0 40% 0);
+        transform: translate(2px, -2px);
+    }
+    100% {
+        clip-path: inset(10% 0 70% 0);
+        transform: translate(-2px, 2px);
+    }
+}
+
+/* Cyberpunk grid background */
+.cyber-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 0, 110, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 110, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 10s linear infinite;
+    pointer-events: none;
+    opacity: 0.1;
+}
+
+@keyframes grid-move {
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(50px, 50px);
+    }
+}
+
+/* Floating orbs background */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.4;
+    animation: orb-float 20s infinite;
+}
+
+.orb1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--gradient-1), transparent);
+    top: -200px;
+    left: -200px;
+    animation-duration: 25s;
+    filter: blur(60px);
+    opacity: 0.6;
+}
+
+.orb2 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, var(--gradient-3), transparent);
+    top: 50%;
+    right: -150px;
+    animation-duration: 30s;
+    animation-delay: -5s;
+    filter: blur(50px);
+    opacity: 0.5;
+}
+
+.orb3 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--gradient-4), transparent);
+    bottom: -175px;
+    left: 30%;
+    animation-duration: 35s;
+    animation-delay: -10s;
+    filter: blur(55px);
+    opacity: 0.55;
+}
+
+@keyframes orb-float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(100px, -100px) scale(1.1);
+    }
+    66% {
+        transform: translate(-100px, 100px) scale(0.9);
+    }
+}
+
+/* Advanced button hover effects */
+.action-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
+}
+
+.action-btn:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+/* Typewriter cursor */
+.typing-cursor::after {
+    content: '|';
+    animation: cursor-blink 1s infinite;
+    color: var(--gradient-1);
+}
+
+@keyframes cursor-blink {
+    0%, 49% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+}
+
+/* Loading wave animation */
+.wave-loading {
+    display: flex;
+    gap: 5px;
+}
+
+.wave-loading span {
+    width: 4px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--gradient-1), var(--gradient-3));
+    animation: wave 1.2s ease-in-out infinite;
+}
+
+.wave-loading span:nth-child(1) { animation-delay: 0s; }
+.wave-loading span:nth-child(2) { animation-delay: 0.1s; }
+.wave-loading span:nth-child(3) { animation-delay: 0.2s; }
+.wave-loading span:nth-child(4) { animation-delay: 0.3s; }
+.wave-loading span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes wave {
+    0%, 100% {
+        transform: scaleY(0.5);
+    }
+    50% {
+        transform: scaleY(1);
+    }
+}

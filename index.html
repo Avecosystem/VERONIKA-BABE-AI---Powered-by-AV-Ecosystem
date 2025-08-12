@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERONIKA - BABE AI Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .api-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(
+                45deg,
+                #ff0080, #ff8c00, #ffd700, #32cd32, 
+                #00bfff, #8a2be2, #ff69b4, #ff0080
+            );
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+            letter-spacing: 5px;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #b8b8b8;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 500px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            text-align: left;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.3);
+        }
+
+        .message-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .message.user .message-actions {
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .initial-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .input-container {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-btn, .voice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn:hover, .voice-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .bottom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .message-content {
+                max-width: 90%;
+            }
+            
+            .bottom-controls {
+                gap: 10px;
+            }
+            
+            .control-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="api-status">
+                <div class="status-dot"></div>
+                <span>API Connected</span>
+            </div>
+            <h1 class="logo">VERONIKA</h1>
+            <p class="subtitle">BABE AI - Powered by AV Ecosystem</p>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="initial-message">
+                    <p>I am VERONIKA, an BABE AI chatbot powered by the AV Ecosystem. I am designed to be helpful and engaging. Hi there! How can I help you today?</p>
+                </div>
+            </div>
+            
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                VERONIKA is thinking...
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="input-field" 
+                        placeholder="Type your message here..." 
+                        rows="1"
+                    ></textarea>
+                    <button class="voice-btn" id="voiceBtn" title="Voice Input">🎤</button>
+                    <button class="send-btn" id="sendBtn" title="Send Message">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-controls">
+            <button class="control-btn" id="exportBtn">
+                📄 Export Chat
+            </button>
+            <button class="control-btn" id="clearBtn">
+                🗑️ Clear Chat
+            </button>
+            <button class="control-btn" id="themeBtn">
+                🎨 Theme
+            </button>
+            <button class="control-btn" id="communityBtn">
+                👥 Join Community
+            </button>
+            <button class="control-btn" id="coinBtn">
+                💰 AV BabeCoin
+            </button>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 AV Ecosystem. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        class VeronikaChatbot {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.loadingIndicator = document.getElementById('loadingIndicator');
+                this.currentEditingMessage = null;
+                
+                this.setupEventListeners();
+                this.setupVoiceRecognition();
+                this.autoResizeTextarea();
+                this.checkApiHealth();
+            }
+
+            setupEventListeners() {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // Control buttons
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearChat());
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportChat());
+                document.getElementById('themeBtn').addEventListener('click', () => this.toggleTheme());
+                document.getElementById('communityBtn').addEventListener('click', () => this.joinCommunity());
+                document.getElementById('coinBtn').addEventListener('click', () => this.showCoinInfo());
+            }
+
+            setupVoiceRecognition() {
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        this.messageInput.value = transcript;
+                        this.voiceBtn.innerHTML = '🎤';
+                    };
+
+                    this.recognition.onerror = () => {
+                        this.voiceBtn.innerHTML = '🎤';
+                        alert('Voice recognition error. Please try again.');
+                    };
+
+                    this.voiceBtn.addEventListener('click', () => {
+                        if (this.recognition) {
+                            this.voiceBtn.innerHTML = '🔴';
+                            this.recognition.start();
+                        }
+                    });
+                } else {
+                    this.voiceBtn.style.display = 'none';
+                }
+            }
+
+            autoResizeTextarea() {
+                this.messageInput.addEventListener('input', () => {
+                    this.messageInput.style.height = 'auto';
+                    this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
+                });
+            }
+
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+
+                // Clear input and disable send button
+                this.messageInput.value = '';
+                this.messageInput.style.height = 'auto';
+                this.sendBtn.disabled = true;
+
+                // Add user message
+                this.addMessage(message, 'user');
+
+                // Show loading
+                this.loadingIndicator.classList.add('active');
+
+                try {
+                    // Direct API call to Gemini
+                    const API_KEY = 'AIzaSyAHDyynI_EveM7Aic2gVleGv9JBJebARNU';
+                    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+                    
+                    const requestBody = {
+                        contents: [{
+                            parts: [{
+                                text: `You are VERONIKA, a helpful and engaging BABE AI chatbot powered by the AV Ecosystem. You should be friendly, informative, and provide helpful responses. User message: ${message}`
+                            }]
+                        }]
+                    };
+
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    const data = await response.json();
+                    
+                    // Hide loading
+                    this.loadingIndicator.classList.remove('active');
+
+                    if (response.ok && data.candidates && data.candidates[0]) {
+                        const botResponse = data.candidates[0].content.parts[0].text;
+                        this.addMessage(botResponse, 'bot');
+                        this.updateApiStatus(true);
+                    } else {
+                        console.error('API Error:', data);
+                        this.addMessage('Sorry, I encountered an error with the AI service. Please try again.', 'bot');
+                        this.updateApiStatus(false);
+                    }
+                } catch (error) {
+                    this.loadingIndicator.classList.remove('active');
+                    console.error('Network Error:', error);
+                    
+                    if (!navigator.onLine) {
+                        this.addMessage('No internet connection. Please check your network and try again.', 'bot');
+                    } else {
+                        this.addMessage('Connection error. Please check your internet connection and try again.', 'bot');
+                    }
+                    this.updateApiStatus(false);
+                } finally {
+                    this.sendBtn.disabled = false;
+                }
+            }
+
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = content;
+                
+                const messageActions = document.createElement('div');
+                messageActions.className = 'message-actions';
+                
+                // Add action buttons
+                const copyBtn = this.createActionButton('Copy', () => this.copyMessage(content));
+                messageActions.appendChild(copyBtn);
+                
+                if (sender === 'user') {
+                    const editBtn = this.createActionButton('Edit', () => this.editMessage(messageDiv, content));
+                    const resendBtn = this.createActionButton('Resend', () => this.resendMessage(content));
+                    messageActions.appendChild(editBtn);
+                    messageActions.appendChild(resendBtn);
+                }
+                
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(messageActions);
+                
+                // Remove initial message if it exists
+                const initialMessage = this.chatMessages.querySelector('.initial-message');
+                if (initialMessage) {
+                    initialMessage.remove();
+                }
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            createActionButton(text, onClick) {
+                const button = document.createElement('button');
+                button.className = 'action-btn';
+                button.textContent = text;
+                button.onclick = onClick;
+                return button;
+            }
+
+            copyMessage(content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    this.showNotification('Message copied to clipboard!');
+                });
+            }
+
+            editMessage(messageDiv, originalContent) {
+                if (this.currentEditingMessage) {
+                    this.cancelEdit();
+                }
+
+                this.currentEditingMessage = messageDiv;
+                const messageContent = messageDiv.querySelector('.message-content');
+                
+                const editInput = document.createElement('textarea');
+                editInput.value = originalContent;
+                editInput.className = 'input-field';
+                editInput.style.width = '100%';
+                editInput.style.marginBottom = '10px';
+                
+                const saveBtn = this.createActionButton('Save', () => this.saveEdit(editInput.value));
+                const cancelBtn = this.createActionButton('Cancel', () => this.cancelEdit());
+                
+                messageContent.innerHTML = '';
+                messageContent.appendChild(editInput);
+                messageContent.appendChild(saveBtn);
+                messageContent.appendChild(cancelBtn);
+                
+                editInput.focus();
+            }
+
+            saveEdit(newContent) {
+                if (!newContent.trim()) return;
+                
+                const messageContent = this.currentEditingMessage.querySelector('.message-content');
+                messageContent.textContent = newContent;
+                this.currentEditingMessage = null;
+                
+                // Resend the edited message
+                this.resendMessage(newContent);
+            }
+
+            cancelEdit() {
+                if (this.currentEditingMessage) {
+                    location.reload(); // Simple way to restore original state
+                }
+            }
+
+            async resendMessage(content) {
+                // Add user message again
+                this.addMessage(content, 'user');
+                
+                // Show loading
+                this.loadingIndicator.classList.add('active');
+                
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: content })
+                    });
+
+                    const data = await response.json();
+                    this.loadingIndicator.classList.remove('active');
+
+                    if (response.ok) {
+                        this.addMessage(data.response, 'bot');
+                    } else {
+                        this.addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                    }
+                } catch (error) {
+                    this.loadingIndicator.classList.remove('active');
+                    this.addMessage('Connection error. Please try again.', 'bot');
+                }
+            }
+
+            async clearChat() {
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    this.chatMessages.innerHTML = `
+                        <div class="initial-message">
+                            <p>I am VERONIKA, an BABE AI chatbot powered by the AV Ecosystem. I am designed to be helpful and engaging. Hi there! How can I help you today?</p>
+                        </div>
+                    `;
+                    this.showNotification('Chat cleared successfully!');
+                }
+            }
+
+            async exportChat() {
+                try {
+                    // Get all messages from chat
+                    const messages = [];
+                    const messageElements = this.chatMessages.querySelectorAll('.message');
+                    
+                    messageElements.forEach(msgEl => {
+                        const isBot = msgEl.classList.contains('bot');
+                        const content = msgEl.querySelector('.message-content').textContent;
+                        messages.push({
+                            sender: isBot ? 'bot' : 'user',
+                            content: content,
+                            timestamp: new Date().toISOString()
+                        });
+                    });
+                    
+                    const exportData = {
+                        conversation: messages,
+                        exported_at: new Date().toISOString(),
+                        chatbot: 'VERONIKA - BABE AI'
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `veronika_chat_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    this.showNotification('Chat exported successfully!');
+                } catch (error) {
+                    this.showNotification('Error exporting chat. Please try again.');
+                }
+            }
+
+            toggleTheme() {
+                // Simple theme toggle - could be expanded
+                document.body.style.filter = document.body.style.filter === 'invert(1)' ? 'none' : 'invert(1)';
+                this.showNotification('Theme toggled!');
+            }
+
+            joinCommunity() {
+                // Open Join Community link
+                window.open('https://link3.to/VY5JG29F', '_blank');
+                this.showNotification('Opening AV Ecosystem Community...');
+            }
+
+            showCoinInfo() {
+                // Open AV BabeCoin link
+                window.open('https://link3.to/av_babecoin', '_blank');
+                this.showNotification('Opening AV BabeCoin info...');
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(102, 126, 234, 0.9);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    z-index: 1000;
+                    backdrop-filter: blur(10px);
+                    animation: slideInRight 0.3s ease;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            updateApiStatus(connected) {
+                const statusElement = document.querySelector('.api-status span');
+                const statusDot = document.querySelector('.status-dot');
+                
+                if (connected) {
+                    statusElement.textContent = 'API Connected';
+                    statusDot.style.background = '#00ff00';
+                } else {
+                    statusElement.textContent = 'API Disconnected';
+                    statusDot.style.background = '#ff0000';
+                }
+            }
+
+            async checkApiHealth() {
+                // For standalone mode, we'll assume API is connected if we can access the internet
+                try {
+                    // Simple connectivity check
+                    const response = await fetch('https://www.google.com/favicon.ico', { 
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache'
+                    });
+                    this.updateApiStatus(true);
+                } catch (error) {
+                    console.log('Internet connectivity check failed:', error);
+                    this.updateApiStatus(false);
+                }
+            }
+        }
+
+        // Initialize the chatbot when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new VeronikaChatbot();
+        });
+    </script>
+</body>
+</html>
