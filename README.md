@@ -6,7 +6,6 @@ A fully functional AI chatbot named 'VERONIKA' powered by Google's Gemini API wi
 
 - **Rainbow Color Transition UI**: Beautiful animated rainbow text for the VERONIKA title
 - **Neon & Black Theme**: Modern dark theme with neon accents and glass morphism effects
-- **Gemini AI Integration**: Powered by Google's Gemini Pro model for intelligent responses
 - **Interactive Features**:
   - Edit user messages
   - Resend messages
@@ -23,7 +22,7 @@ A fully functional AI chatbot named 'VERONIKA' powered by Google's Gemini API wi
 
 ### Prerequisites
 - Python 3.7+
-- Google Gemini API key (already included in the code)
+- Babe ai
 
 ### Local Development
 
