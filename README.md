@@ -82,7 +82,7 @@ VERONIKA-Chatbot/
 
 ### Backend (app.py)
 - Flask web server
-- Gemini AI integration with API key: `AIzaSyAHDyynI_EveM7Aic2gVleGv9JBJebARNU`
+- Babe AI integration with API key: `AIzaSyAHDyynI_EveM7Aic2gVleGv9JBJebARNU`
 - Conversation history management
 - RESTful API endpoints for chat, clear, and export
 - Uses Gemini 1.5 Flash model for fast, intelligent responses
@@ -130,7 +130,7 @@ context = "You are VERONIKA, a helpful and engaging BABE AI chatbot powered by t
 
 ## Troubleshooting 🔧
 
-1. **API Issues**: The Gemini API key is pre-configured
+1. **API Issues**: The Babe ai API key is pre-configured
 2. **Voice Not Working**: Voice recognition requires HTTPS in production
 3. **Styling Issues**: Clear browser cache and reload
 
